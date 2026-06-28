@@ -284,15 +284,6 @@ h1 {
   transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
 }
 
-.assembly-seat.has-crime .assembly-seat-core {
-  box-shadow: 0 0 0 2px rgba(248, 81, 73, 0.18), 0 0 14px rgba(248, 81, 73, 0.22);
-}
-
-.assembly-seat.unknown .assembly-seat-core {
-  filter: saturate(0.7);
-  box-shadow: 0 0 0 2px rgba(154, 164, 178, 0.16), 0 0 12px rgba(154, 164, 178, 0.18);
-}
-
 .assembly-seat:hover,
 .assembly-seat:focus-visible {
   z-index: 20;
@@ -498,32 +489,33 @@ h1 {
   overflow: hidden;
 }
 
-.party-bar-crime {
+.party-bar-fill {
   height: 100%;
   border-radius: 4px;
   transition: width 1s ease;
 }
 
-/* 죄종별 분포 바 차트 */
-.crime-chart {
+/* 공식자료 연결 상태 바 */
+.source-status {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
 }
 
-.crime-row {
+.source-status-row {
   display: flex;
   align-items: center;
   gap: 1rem;
   font-size: 0.85rem;
 }
 
-.crime-label {
-  width: 80px;
+.source-status-label {
+  width: 86px;
+  flex-shrink: 0;
   color: var(--text-sub);
 }
 
-.crime-bar-wrap {
+.source-status-bar-wrap {
   flex-grow: 1;
   height: 12px;
   background: rgba(255, 255, 255, 0.03);
@@ -531,15 +523,15 @@ h1 {
   overflow: hidden;
 }
 
-.crime-bar {
+.source-status-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
   border-radius: 6px;
   transition: width 1s ease;
 }
 
-.crime-value {
-  width: 40px;
+.source-status-value {
+  min-width: 130px;
   text-align: right;
   font-family: 'Outfit', sans-serif;
   font-weight: 600;
@@ -618,49 +610,6 @@ h1 {
   background: rgba(47, 129, 247, 0.1);
   border-color: rgba(47, 129, 247, 0.3);
   color: var(--accent-blue);
-}
-
-/* AI 해석 터미널 콘솔 */
-.ai-console {
-  background: #06090e;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 1rem;
-  margin-top: 1.2rem;
-  font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 0.85rem;
-  color: #7ee787;
-  overflow-x: auto;
-  position: relative;
-}
-
-.ai-console-header {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-sub);
-  font-size: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 0.3rem;
-}
-
-.ai-console-line {
-  margin-bottom: 0.2rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.ai-console-line .prompt {
-  color: var(--accent-blue);
-  user-select: none;
-}
-
-.ai-console-line .sql {
-  color: var(--accent-purple);
-}
-
-.ai-console-line .count {
-  color: #d1f4ff;
 }
 
 /* 필터 버튼 영역 */
@@ -792,8 +741,7 @@ h1 {
   width: 100%;
 }
 
-/* 전과 개수 표기 뱃지 */
-.crime-badge {
+.activity-badge {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.3rem 0.8rem;
@@ -803,24 +751,9 @@ h1 {
   gap: 0.3rem;
   width: 100%;
   justify-content: center;
-}
-
-.crime-badge.clean {
-  background: rgba(46, 160, 67, 0.15);
-  border: 1px solid rgba(46, 160, 67, 0.3);
-  color: #56d364;
-}
-
-.crime-badge.has-crime {
-  background: rgba(248, 81, 73, 0.15);
-  border: 1px solid rgba(248, 81, 73, 0.3);
-  color: #ff7b72;
-}
-
-.crime-badge.unknown {
-  background: rgba(154, 164, 178, 0.12);
-  border: 1px solid rgba(154, 164, 178, 0.26);
-  color: #d1d5db;
+  background: rgba(47, 129, 247, 0.12);
+  border: 1px solid rgba(47, 129, 247, 0.28);
+  color: #d1e8ff;
 }
 
 /* 의원 상세 모달 */
@@ -845,7 +778,7 @@ h1 {
   border: 1px solid var(--card-border);
   border-radius: 24px;
   width: 100%;
-  max-width: 650px;
+  max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -955,82 +888,6 @@ h1 {
   fill: var(--accent-blue);
 }
 
-/* 전과 리스트 카드 */
-.modal-crimes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.modal-crime-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
-  padding: 1.2rem;
-  position: relative;
-}
-
-.modal-crime-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.modal-crime-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ff7b72;
-}
-
-.modal-crime-tag {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  background: rgba(248, 81, 73, 0.1);
-  color: #ff7b72;
-  border: 1px solid rgba(248, 81, 73, 0.2);
-}
-
-.modal-crime-meta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: var(--text-sub);
-  margin-bottom: 0.8rem;
-}
-
-.modal-crime-meta span strong {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-/* AI 해설 카드 */
-.ai-explanation-card {
-  background: rgba(47, 129, 247, 0.05);
-  border: 1px solid rgba(47, 129, 247, 0.15);
-  border-radius: 10px;
-  padding: 0.8rem 1rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: #c9d1d9;
-  position: relative;
-  padding-left: 2.2rem;
-}
-
-.ai-explanation-card::before {
-  content: '✦';
-  position: absolute;
-  left: 0.8rem;
-  top: 0.7rem;
-  color: var(--accent-blue);
-  font-size: 1rem;
-  font-weight: bold;
-}
-
 .modal-clean-state {
   text-align: center;
   padding: 3rem 1.5rem;
@@ -1062,6 +919,96 @@ h1 {
   color: var(--text-sub);
 }
 
+.district-brief {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.district-brief > div {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.district-kicker {
+  display: block;
+  color: var(--text-sub);
+  font-size: 0.78rem;
+  margin-bottom: 0.25rem;
+}
+
+.district-brief strong {
+  font-size: 1rem;
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.source-card {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.source-card h4 {
+  font-size: 1rem;
+  margin-bottom: 0.45rem;
+}
+
+.source-card p {
+  color: var(--text-sub);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.source-card a {
+  margin-top: 1rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 36px;
+  border-radius: 8px;
+  background: rgba(47, 129, 247, 0.16);
+  border: 1px solid rgba(47, 129, 247, 0.32);
+  color: #d1e8ff;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.activity-note {
+  background: rgba(47, 129, 247, 0.045);
+  border: 1px solid rgba(47, 129, 247, 0.12);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.keyword-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.keyword-chips span {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  color: var(--text-sub);
+  font-size: 0.78rem;
+}
+
 /* 공익 알림 안내 */
 .public-notice {
   font-size: 0.75rem;
@@ -1090,6 +1037,10 @@ h1 {
   }
   .modal-name-row {
     justify-content: center;
+  }
+  .district-brief,
+  .source-grid {
+    grid-template-columns: 1fr;
   }
   .dashboard-card h3 {
     align-items: flex-start;
