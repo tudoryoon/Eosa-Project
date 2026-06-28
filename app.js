@@ -208,6 +208,18 @@ function handleSearchAndFilters(isAiSearch = true) {
       partyMatch = '새로운미래';
       aiParsingDetails.push('정당: 새로운미래');
       sqlConditions.push("party = '새로운미래'");
+    } else if (query.includes('기본소득')) {
+      partyMatch = '기본소득당';
+      aiParsingDetails.push('정당: 기본소득당');
+      sqlConditions.push("party = '기본소득당'");
+    } else if (query.includes('사회민주')) {
+      partyMatch = '사회민주당';
+      aiParsingDetails.push('정당: 사회민주당');
+      sqlConditions.push("party = '사회민주당'");
+    } else if (query.includes('무소속')) {
+      partyMatch = '무소속';
+      aiParsingDetails.push('정당: 무소속');
+      sqlConditions.push("party = '무소속'");
     }
 
     if (partyMatch) {
@@ -400,8 +412,13 @@ function renderList() {
 
     // 전과 뱃지 스타일
     const hasCrime = member.crimes_count > 0;
-    const badgeClass = hasCrime ? 'crime-badge has-crime' : 'crime-badge clean';
-    const badgeText = hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음';
+    const isVerifiedCrimeData = hasVerifiedCrimeData(member);
+    const badgeClass = isVerifiedCrimeData
+      ? `crime-badge ${hasCrime ? 'has-crime' : 'clean'}`
+      : 'crime-badge unknown';
+    const badgeText = isVerifiedCrimeData
+      ? (hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음')
+      : '전과 확인 필요';
 
     card.innerHTML = `
       <div class="member-avatar">
@@ -413,7 +430,7 @@ function renderList() {
       <div class="member-party-badge">${member.party}</div>
       <div class="member-dist">${member.constituency}</div>
       <div class="${badgeClass}">
-        ${hasCrime ? '⚠️' : '✓'} ${badgeText}
+        ${isVerifiedCrimeData ? (hasCrime ? '⚠️' : '✓') : 'ⓘ'} ${badgeText}
       </div>
     `;
 
@@ -427,13 +444,15 @@ function renderList() {
 // 대시보드 시각화 렌더링
 function renderDashboard() {
   const total = state.members.length;
-  const crimeMembers = state.members.filter(m => m.crimes_count > 0).length;
-  const cleanMembers = total - crimeMembers;
-  const percent = ((crimeMembers / total) * 100).toFixed(2);
+  const verifiedMembers = state.members.filter(hasVerifiedCrimeData);
+  const crimeMembers = verifiedMembers.filter(m => m.crimes_count > 0).length;
+  const cleanMembers = verifiedMembers.filter(m => m.crimes_count === 0).length;
+  const unverifiedMembers = total - verifiedMembers.length;
+  const percent = verifiedMembers.length > 0 ? ((crimeMembers / verifiedMembers.length) * 100).toFixed(2) : null;
 
   // 1. 종합 수치 갱신
-  document.getElementById('dash-percent-text').textContent = `${percent}%`;
-  document.getElementById('dash-crime-circle').style.strokeDashoffset = 314 - (314 * percent) / 100;
+  document.getElementById('dash-percent-text').textContent = percent ? `${percent}%` : '검증중';
+  document.getElementById('dash-crime-circle').style.strokeDashoffset = percent ? 314 - (314 * percent) / 100 : 314;
   document.getElementById('dash-count-crime').textContent = `${crimeMembers}명`;
   document.getElementById('dash-count-clean').textContent = `${cleanMembers}명`;
 
@@ -450,14 +469,14 @@ function renderDashboard() {
   });
 
   // 주요 정당 순 정렬
-  const partyOrder = ['더불어민주당', '국민의힘', '조국혁신당', '개혁신당', '진보당'];
+  const partyOrder = ['더불어민주당', '국민의힘', '조국혁신당', '무소속', '진보당', '개혁신당', '기본소득당', '사회민주당'];
   const partyChartContainer = document.getElementById('party-chart-container');
   partyChartContainer.innerHTML = '';
 
   partyOrder.forEach(partyName => {
     const data = partyData[partyName] || { total: 0, crime: 0 };
     if (data.total === 0) return;
-    const ratio = ((data.crime / data.total) * 100).toFixed(1);
+    const seatRatio = ((data.total / total) * 100).toFixed(1);
     const colors = getPartyColors(partyName);
 
     const row = document.createElement('div');
@@ -468,11 +487,11 @@ function renderDashboard() {
           <span class="party-dot" style="background: ${colors.main}"></span>
           ${partyName} <span style="color: var(--text-sub)">(${data.total}석)</span>
         </span>
-        <span>${data.crime}명 전과자 <strong>(${ratio}%)</strong></span>
+        <span>전체 의석 중 <strong>${seatRatio}%</strong></span>
       </div>
       <div class="party-bar-container">
         <div class="party-bar-total" style="width: 100%">
-          <div class="party-bar-crime" style="width: ${ratio}%; background: ${colors.main}"></div>
+          <div class="party-bar-crime" style="width: ${seatRatio}%; background: ${colors.main}"></div>
         </div>
       </div>
     `;
@@ -502,7 +521,19 @@ function renderDashboard() {
   const crimeChartContainer = document.getElementById('crime-chart-container');
   crimeChartContainer.innerHTML = '';
 
-  Object.entries(crimeCategories).forEach(([category, count]) => {
+  if (unverifiedMembers > 0 && verifiedMembers.length === 0) {
+    const row = document.createElement('div');
+    row.className = 'crime-row';
+    row.innerHTML = `
+      <div class="crime-label">확인 필요</div>
+      <div class="crime-bar-wrap">
+        <div class="crime-bar" style="width: 100%"></div>
+      </div>
+      <div class="crime-value">${unverifiedMembers}명</div>
+    `;
+    crimeChartContainer.appendChild(row);
+  } else {
+    Object.entries(crimeCategories).forEach(([category, count]) => {
     const barWidth = maxCrimeVal > 0 ? (count / maxCrimeVal) * 100 : 0;
     
     const row = document.createElement('div');
@@ -515,7 +546,8 @@ function renderDashboard() {
       <div class="crime-value">${count}건</div>
     `;
     crimeChartContainer.appendChild(row);
-  });
+    });
+  }
 
   renderAssemblySeats(partyData);
 }
@@ -529,7 +561,7 @@ function renderAssemblySeats(partyData) {
   floor.querySelectorAll('.assembly-seat').forEach(seat => seat.remove());
   legend.innerHTML = '';
 
-  const partyOrder = ['더불어민주당', '국민의힘', '조국혁신당', '개혁신당', '진보당', '새로운미래', '기본소득당', '사회민주당'];
+  const partyOrder = ['더불어민주당', '국민의힘', '조국혁신당', '무소속', '진보당', '개혁신당', '기본소득당', '사회민주당', '새로운미래'];
   const sortedMembers = [...state.members].sort((a, b) => {
     const partyDiff = partyOrder.indexOf(a.party) - partyOrder.indexOf(b.party);
     if (partyDiff !== 0) return partyDiff;
@@ -570,15 +602,16 @@ function renderAssemblySeats(partyData) {
       const y = 94 + Math.sin(angle) * yRadius;
       const colors = getPartyColors(member.party);
       const hasCrime = member.crimes_count > 0;
+      const isVerifiedCrimeData = hasVerifiedCrimeData(member);
 
       const seat = document.createElement('button');
       seat.type = 'button';
-      seat.className = `assembly-seat ${hasCrime ? 'has-crime' : 'clean'}`;
+      seat.className = `assembly-seat ${isVerifiedCrimeData ? (hasCrime ? 'has-crime' : 'clean') : 'unknown'}`;
       seat.style.left = `${x}%`;
       seat.style.top = `${y}%`;
       seat.style.setProperty('--seat-color', colors.main);
       seat.style.setProperty('--seat-glow', colors.glow);
-      seat.setAttribute('aria-label', `${member.name}, ${member.party}, ${hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음'}`);
+      seat.setAttribute('aria-label', `${member.name}, ${member.party}, ${isVerifiedCrimeData ? (hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음') : '전과 확인 필요'}`);
       seat.innerHTML = `
         <span class="assembly-seat-core"></span>
         <span class="assembly-tooltip">
@@ -595,6 +628,10 @@ function renderAssemblySeats(partyData) {
 }
 
 function renderSeatCrimeSummary(member) {
+  if (!hasVerifiedCrimeData(member)) {
+    return '<span class="assembly-tooltip-unknown">전과 자료 확인 필요</span>';
+  }
+
   if (member.crimes_count === 0) {
     return '<span class="assembly-tooltip-clean">전과 없음</span>';
   }
@@ -609,6 +646,10 @@ function renderSeatCrimeSummary(member) {
     ${crimeRows}
     ${moreText}
   `;
+}
+
+function hasVerifiedCrimeData(member) {
+  return Number.isInteger(member.crimes_count);
 }
 
 function escapeHtml(value) {
@@ -635,6 +676,12 @@ function getPartyColors(party) {
       return { main: 'var(--party-progressive)', glow: 'rgba(214, 0, 28, 0.2)' };
     case '새로운미래':
       return { main: 'var(--party-newfuture)', glow: 'rgba(0, 181, 181, 0.2)' };
+    case '기본소득당':
+      return { main: '#b84cff', glow: 'rgba(184, 76, 255, 0.2)' };
+    case '사회민주당':
+      return { main: '#41c36d', glow: 'rgba(65, 195, 109, 0.2)' };
+    case '무소속':
+      return { main: '#9aa4b2', glow: 'rgba(154, 164, 178, 0.2)' };
     default:
       return { main: 'var(--party-etc)', glow: 'rgba(127, 140, 141, 0.2)' };
   }
@@ -653,7 +700,17 @@ function openModal(member) {
   document.getElementById('modal-member-party').style.background = colors.main;
   document.getElementById('modal-member-dist').textContent = member.constituency;
 
-  if (member.crimes_count === 0) {
+  if (!hasVerifiedCrimeData(member)) {
+    modalBody.innerHTML = `
+      <div class="modal-clean-state unverified">
+        <svg viewBox="0 0 24 24">
+          <path d="M11 17h2v-6h-2v6zm1-14C6.48 3 2 7.48 2 13s4.48 10 10 10 10-4.48 10-10S17.52 3 12 3zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2V7h-2v2z"/>
+        </svg>
+        <div class="modal-clean-title">전과 자료 확인 필요</div>
+        <div class="modal-clean-desc">현역 의원 명부는 최신 변동을 반영했지만, 전과 정보는 선관위 후보자 공시자료와 별도 대조 전입니다.</div>
+      </div>
+    `;
+  } else if (member.crimes_count === 0) {
     modalBody.innerHTML = `
       <div class="modal-clean-state">
         <svg viewBox="0 0 24 24">

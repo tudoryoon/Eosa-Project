@@ -288,6 +288,11 @@ h1 {
   box-shadow: 0 0 0 2px rgba(248, 81, 73, 0.18), 0 0 14px rgba(248, 81, 73, 0.22);
 }
 
+.assembly-seat.unknown .assembly-seat-core {
+  filter: saturate(0.7);
+  box-shadow: 0 0 0 2px rgba(154, 164, 178, 0.16), 0 0 12px rgba(154, 164, 178, 0.18);
+}
+
 .assembly-seat:hover,
 .assembly-seat:focus-visible {
   z-index: 20;
@@ -359,6 +364,11 @@ h1 {
 
 .assembly-tooltip-clean {
   color: #56d364;
+  font-weight: 800;
+}
+
+.assembly-tooltip-unknown {
+  color: #d1d5db;
   font-weight: 800;
 }
 
@@ -807,6 +817,12 @@ h1 {
   color: #ff7b72;
 }
 
+.crime-badge.unknown {
+  background: rgba(154, 164, 178, 0.12);
+  border: 1px solid rgba(154, 164, 178, 0.26);
+  color: #d1d5db;
+}
+
 /* 의원 상세 모달 */
 .modal-overlay {
   position: fixed;
@@ -1028,6 +1044,10 @@ h1 {
   height: 50px;
   fill: #56d364;
   margin-bottom: 1rem;
+}
+
+.modal-clean-state.unverified svg {
+  fill: #d1d5db;
 }
 
 .modal-clean-title {
