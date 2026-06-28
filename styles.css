@@ -170,6 +170,204 @@ h1 {
   align-items: center;
 }
 
+/* 국회 의석 구조도 */
+.assembly-card {
+  grid-column: 1 / -1;
+  overflow: visible;
+}
+
+.assembly-caption {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  font-weight: 500;
+}
+
+.assembly-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.assembly-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-sub);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.assembly-legend-item strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.assembly-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.assembly-floor {
+  position: relative;
+  width: 100%;
+  height: clamp(290px, 48vw, 520px);
+  overflow: visible;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 50% 98%, rgba(47, 129, 247, 0.16) 0%, rgba(47, 129, 247, 0.04) 34%, transparent 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.assembly-floor::before,
+.assembly-floor::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 86%;
+  height: 82%;
+  transform: translateX(-50%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50% 50% 0 0;
+  pointer-events: none;
+}
+
+.assembly-floor::after {
+  width: 46%;
+  height: 43%;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.assembly-podium {
+  position: absolute;
+  left: 50%;
+  bottom: 3.5%;
+  transform: translateX(-50%);
+  min-width: 128px;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+}
+
+.assembly-seat {
+  position: absolute;
+  width: clamp(8px, 1.25vw, 14px);
+  height: clamp(8px, 1.25vw, 14px);
+  transform: translate(-50%, -50%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+
+.assembly-seat-core {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--seat-color, var(--party-etc));
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.03), 0 0 12px var(--seat-glow, rgba(255, 255, 255, 0.12));
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.assembly-seat.has-crime .assembly-seat-core {
+  box-shadow: 0 0 0 2px rgba(248, 81, 73, 0.18), 0 0 14px rgba(248, 81, 73, 0.22);
+}
+
+.assembly-seat:hover,
+.assembly-seat:focus-visible {
+  z-index: 20;
+  outline: none;
+}
+
+.assembly-seat:hover .assembly-seat-core,
+.assembly-seat:focus-visible .assembly-seat-core {
+  transform: scale(1.75);
+  filter: brightness(1.22);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18), 0 0 22px var(--seat-glow, rgba(255, 255, 255, 0.2));
+}
+
+.assembly-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  width: min(260px, 78vw);
+  transform: translateX(-50%) translateY(6px);
+  background: #111720;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+  color: var(--text-main);
+  padding: 0.75rem 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  text-align: left;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.assembly-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%) rotate(45deg);
+  background: #111720;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.assembly-tooltip strong,
+.assembly-tooltip em,
+.assembly-tooltip span {
+  display: block;
+}
+
+.assembly-tooltip strong {
+  font-size: 0.95rem;
+  margin-bottom: 0.1rem;
+}
+
+.assembly-tooltip em {
+  color: var(--text-sub);
+  font-style: normal;
+  margin-bottom: 0.45rem;
+}
+
+.assembly-tooltip-count {
+  color: #ff7b72;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.assembly-tooltip-clean {
+  color: #56d364;
+  font-weight: 800;
+}
+
+.assembly-seat:hover .assembly-tooltip,
+.assembly-seat:focus-visible .assembly-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* 통계 서머리 수치 */
 .stat-summary {
   display: flex;
@@ -872,6 +1070,22 @@ h1 {
   }
   .modal-name-row {
     justify-content: center;
+  }
+  .dashboard-card h3 {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .assembly-floor {
+    height: 330px;
+  }
+  .assembly-caption {
+    font-size: 0.72rem;
+  }
+  .assembly-podium {
+    min-width: 104px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.76rem;
   }
 }
 

@@ -11,11 +11,7 @@ const state = {
     party: 'all',
     crimeStatus: 'all',
     region: 'all'
-  },
-  aiConsoleLogs: [
-    'System initialized. Standing by for queries...',
-    'Enter a search query like "음주운전 전과가 있는 서울 지역구 의원" to test AI parsing.'
-  ]
+  }
 };
 
 // DOM 요소 캐시
@@ -41,7 +37,6 @@ function init() {
   setupEventListeners();
   populateFilterOptions();
   render();
-  addConsoleLine('Database loaded. 300 assembly members loaded into memory.', 'system');
 }
 
 // 필터 옵션 동적 추가 (지역구 추출)
@@ -67,6 +62,8 @@ function populateFilterOptions() {
 
 // 콘솔에 로그 추가 (타이핑 효과 시뮬레이션)
 function addConsoleLine(text, type = 'system') {
+  if (!DOM.consoleLines) return;
+
   const time = new Date().toLocaleTimeString();
   let prefix = `[${time}] `;
   
@@ -519,6 +516,108 @@ function renderDashboard() {
     `;
     crimeChartContainer.appendChild(row);
   });
+
+  renderAssemblySeats(partyData);
+}
+
+// 국회 본회의장 형태의 반원형 의석 배치 렌더링
+function renderAssemblySeats(partyData) {
+  const floor = document.getElementById('assembly-floor');
+  const legend = document.getElementById('assembly-legend');
+  if (!floor || !legend) return;
+
+  floor.querySelectorAll('.assembly-seat').forEach(seat => seat.remove());
+  legend.innerHTML = '';
+
+  const partyOrder = ['더불어민주당', '국민의힘', '조국혁신당', '개혁신당', '진보당', '새로운미래', '기본소득당', '사회민주당'];
+  const sortedMembers = [...state.members].sort((a, b) => {
+    const partyDiff = partyOrder.indexOf(a.party) - partyOrder.indexOf(b.party);
+    if (partyDiff !== 0) return partyDiff;
+    return b.crimes_count - a.crimes_count || a.name.localeCompare(b.name, 'ko');
+  });
+
+  partyOrder.forEach(party => {
+    const data = partyData[party];
+    if (!data) return;
+
+    const colors = getPartyColors(party);
+    const item = document.createElement('div');
+    item.className = 'assembly-legend-item';
+    item.innerHTML = `
+      <span class="assembly-legend-dot" style="background: ${colors.main}"></span>
+      <span>${party}</span>
+      <strong>${data.total}석</strong>
+    `;
+    legend.appendChild(item);
+  });
+
+  const rows = [18, 24, 30, 36, 42, 48, 48, 54];
+  let memberIndex = 0;
+
+  rows.forEach((seatCount, rowIndex) => {
+    const xRadius = 20 + rowIndex * 4;
+    const yRadius = 18 + rowIndex * 8.7;
+    const startAngle = 202;
+    const endAngle = 338;
+
+    for (let i = 0; i < seatCount; i++) {
+      const member = sortedMembers[memberIndex];
+      if (!member) return;
+
+      const ratio = seatCount === 1 ? 0.5 : i / (seatCount - 1);
+      const angle = (startAngle + (endAngle - startAngle) * ratio) * Math.PI / 180;
+      const x = 50 + Math.cos(angle) * xRadius;
+      const y = 94 + Math.sin(angle) * yRadius;
+      const colors = getPartyColors(member.party);
+      const hasCrime = member.crimes_count > 0;
+
+      const seat = document.createElement('button');
+      seat.type = 'button';
+      seat.className = `assembly-seat ${hasCrime ? 'has-crime' : 'clean'}`;
+      seat.style.left = `${x}%`;
+      seat.style.top = `${y}%`;
+      seat.style.setProperty('--seat-color', colors.main);
+      seat.style.setProperty('--seat-glow', colors.glow);
+      seat.setAttribute('aria-label', `${member.name}, ${member.party}, ${hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음'}`);
+      seat.innerHTML = `
+        <span class="assembly-seat-core"></span>
+        <span class="assembly-tooltip">
+          <strong>${escapeHtml(member.name)}</strong>
+          <em>${escapeHtml(member.party)} · ${escapeHtml(member.constituency)}</em>
+          ${renderSeatCrimeSummary(member)}
+        </span>
+      `;
+      seat.addEventListener('click', () => openModal(member));
+      floor.appendChild(seat);
+      memberIndex++;
+    }
+  });
+}
+
+function renderSeatCrimeSummary(member) {
+  if (member.crimes_count === 0) {
+    return '<span class="assembly-tooltip-clean">전과 없음</span>';
+  }
+
+  const crimeRows = member.crimes.slice(0, 3).map(crime => {
+    return `<span>${escapeHtml(crime.offence)} · ${escapeHtml(crime.sentence)}</span>`;
+  }).join('');
+  const moreText = member.crimes_count > 3 ? `<span>외 ${member.crimes_count - 3}건</span>` : '';
+
+  return `
+    <span class="assembly-tooltip-count">전과 ${member.crimes_count}건</span>
+    ${crimeRows}
+    ${moreText}
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // 정당별 테마 색상 맵

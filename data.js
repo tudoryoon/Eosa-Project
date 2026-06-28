@@ -394,6 +394,7 @@ function generateRandomName() {
 
 // 300명을 채우기 위한 제너레이터 실행
 const allMembers = [...seedMembers];
+const additionalMemberCount = 300 - allMembers.length;
 
 // 당선인 정당 목표 비율 분배 (총 300명)
 // 현재 씨드: 민주당(12명), 국민의힘(13명), 조국혁신당(4명), 개혁신당(2명), 기본소득당(1명) -> 총 32명 (전과자 14, 비전과자 18)
@@ -405,7 +406,7 @@ const allMembers = [...seedMembers];
 // 진보당 남은: 3 - 0 = 3명
 // 새로운미래 남은: 1 - 0 = 1명
 // 사회민주당 남은: 1 - 0 = 1명
-// 총 268명 추가 생성
+// 남은 인원만큼 추가 생성
 
 const targetParties = [];
 for (let i = 0; i < 163; i++) targetParties.push("더불어민주당");
@@ -433,7 +434,7 @@ for (let i = 0; i < 1; i++) crimesTarget.push(4);
 for (let i = 0; i < 7; i++) crimesTarget.push(3);
 for (let i = 0; i < 20; i++) crimesTarget.push(2);
 for (let i = 0; i < 45; i++) crimesTarget.push(1);
-while (crimesTarget.length < 268) {
+while (crimesTarget.length < additionalMemberCount) {
   crimesTarget.push(0);
 }
 
@@ -444,7 +445,7 @@ crimesTarget.sort(() => Math.random() - 0.5);
 const usedDistricts = new Set(seedMembers.map(m => m.constituency));
 const usedNames = new Set(seedMembers.map(m => m.name));
 
-for (let i = 0; i < 268; i++) {
+for (let i = 0; i < additionalMemberCount; i++) {
   const party = targetParties[i];
   const crimesCount = crimesTarget[i];
   

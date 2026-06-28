@@ -6,7 +6,7 @@
   
   <!-- SEO 최적화 메타 태그 -->
   <title>국회위치(위치/전과) | 제22대 국회의원 전과 통합 조회 공익 포털</title>
-  <meta name="description" content="대한민국 제22대 국회의원 300명의 범죄 경력 및 전과 기록을 투명하게 제공합니다. AI 기반 자연어 검색과 의정 감시를 위한 통계 대시보드를 확인하세요.">
+  <meta name="description" content="대한민국 제22대 국회의원 300명의 범죄 경력 및 전과 기록을 투명하게 제공합니다. 자연어 검색과 의정 감시를 위한 통계 대시보드를 확인하세요.">
   <meta name="keywords" content="국회의원 전과, 22대 국회, 전과 조회, 선거 전과, 국회의원 범죄경력, 공익 사이트, 의정 감시">
   <meta name="author" content="공익 의정 감시 프로젝트">
   
@@ -43,13 +43,13 @@
     <!-- 메인 뷰 1: 의원 검색 및 리스트 뷰 -->
     <main id="list-view">
       
-      <!-- AI 검색창 컨테이너 -->
+      <!-- 검색창 컨테이너 -->
       <section class="ai-search-container">
         <div class="search-input-wrap">
           <svg class="search-icon-svg" viewBox="0 0 24 24">
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
-          <input type="text" id="ai-search-input" class="ai-search-input" placeholder="AI 자연어 입력 예: '음주운전 전과가 있는 야당 의원' 또는 '전과 3범 이상인 국회의원'">
+          <input type="text" id="ai-search-input" class="ai-search-input" placeholder="검색어 입력 예: '음주운전 전과가 있는 야당 의원' 또는 '전과 3범 이상인 국회의원'">
         </div>
         
         <div class="search-recommendations">
@@ -62,16 +62,6 @@
           <button class="recommend-tag" data-query="서울 지역구 전과 있는">🏛️ 서울 지역구 전과자</button>
         </div>
 
-        <!-- 모의 AI 콘솔 터미널 -->
-        <div class="ai-console">
-          <div class="ai-console-header">
-            <span>AI NATURAL LANGUAGE QUERY PARSER &amp; CONSOLE</span>
-            <span>STATUS: ACTIVE</span>
-          </div>
-          <div id="console-lines">
-            <!-- 자바스크립트로 출력 -->
-          </div>
-        </div>
       </section>
 
       <!-- 수동 필터 바 -->
@@ -118,6 +108,21 @@
     <main id="dashboard-view" style="display: none;">
       
       <div class="dashboard-grid">
+        <!-- 국회 의석 구조도 -->
+        <div class="dashboard-card assembly-card">
+          <h3>
+            국회 의석 구조도
+            <span class="assembly-caption">의석에 커서를 올리면 전과 정보가 표시됩니다</span>
+          </h3>
+          <div class="assembly-legend" id="assembly-legend">
+            <!-- 자바스크립트로 동적 로드 -->
+          </div>
+          <div class="assembly-floor" id="assembly-floor">
+            <div class="assembly-podium">본회의장</div>
+            <!-- 자바스크립트로 의석 렌더링 -->
+          </div>
+        </div>
+
         <!-- 카드 1: 종합 전과자 비율 -->
         <div class="dashboard-card">
           <h3>
