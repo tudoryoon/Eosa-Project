@@ -418,7 +418,7 @@ function renderList() {
       : 'crime-badge unknown';
     const badgeText = isVerifiedCrimeData
       ? (hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음')
-      : '전과 확인 필요';
+      : '선관위 상세 비공개';
 
     card.innerHTML = `
       <div class="member-avatar">
@@ -525,7 +525,7 @@ function renderDashboard() {
     const row = document.createElement('div');
     row.className = 'crime-row';
     row.innerHTML = `
-      <div class="crime-label">확인 필요</div>
+      <div class="crime-label">선관위 상세 비공개</div>
       <div class="crime-bar-wrap">
         <div class="crime-bar" style="width: 100%"></div>
       </div>
@@ -611,7 +611,7 @@ function renderAssemblySeats(partyData) {
       seat.style.top = `${y}%`;
       seat.style.setProperty('--seat-color', colors.main);
       seat.style.setProperty('--seat-glow', colors.glow);
-      seat.setAttribute('aria-label', `${member.name}, ${member.party}, ${isVerifiedCrimeData ? (hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음') : '전과 확인 필요'}`);
+      seat.setAttribute('aria-label', `${member.name}, ${member.party}, ${isVerifiedCrimeData ? (hasCrime ? `전과 ${member.crimes_count}건` : '전과 없음') : '선거일 후 선관위 상세 전과 비공개'}`);
       seat.innerHTML = `
         <span class="assembly-seat-core"></span>
         <span class="assembly-tooltip">
@@ -629,7 +629,10 @@ function renderAssemblySeats(partyData) {
 
 function renderSeatCrimeSummary(member) {
   if (!hasVerifiedCrimeData(member)) {
-    return '<span class="assembly-tooltip-unknown">전과 자료 확인 필요</span>';
+    return `
+      <span class="assembly-tooltip-unknown">선관위 상세 비공개</span>
+      <span>선거일 후 후보자 재산·전과 등은 공식 상세 조회 기간이 아닙니다.</span>
+    `;
   }
 
   if (member.crimes_count === 0) {
@@ -706,8 +709,8 @@ function openModal(member) {
         <svg viewBox="0 0 24 24">
           <path d="M11 17h2v-6h-2v6zm1-14C6.48 3 2 7.48 2 13s4.48 10 10 10 10-4.48 10-10S17.52 3 12 3zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2V7h-2v2z"/>
         </svg>
-        <div class="modal-clean-title">전과 자료 확인 필요</div>
-        <div class="modal-clean-desc">현역 의원 명부는 최신 변동을 반영했지만, 전과 정보는 선관위 후보자 공시자료와 별도 대조 전입니다.</div>
+        <div class="modal-clean-title">선관위 상세 전과 비공개</div>
+        <div class="modal-clean-desc">선관위 후보자명부는 선거일 후 재산·전과 등 상세 공시자료를 비공개 처리합니다. 공식 상세자료로 대조 가능한 값만 표시하며, 확인되지 않은 전과는 임의로 채우지 않습니다.</div>
       </div>
     `;
   } else if (member.crimes_count === 0) {
