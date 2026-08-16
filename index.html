@@ -29,18 +29,24 @@
     </header>
 
     <!-- 탭 컨트롤러 -->
-    <div class="tabs-container">
-      <button class="tab-btn active" id="tab-list">
+    <div class="tabs-container" role="tablist" aria-label="암행어사 주요 메뉴">
+      <button class="tab-btn active" id="tab-list" role="tab" aria-selected="true">
         <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24">
           <path d="M4 14h6v-10h-6v10zm0 6h6v-4h-6v4zm8-16v4h10v-4h-10zm0 10h10v-4h-10v4zm0 6h10v-4h-10v4z"/>
         </svg>
         지역구 검색
       </button>
-      <button class="tab-btn" id="tab-dashboard">
+      <button class="tab-btn" id="tab-dashboard" role="tab" aria-selected="false">
         <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24">
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm-7-2h2v-5h-2v5zm-4 0h2v-3H7v3zm8 0h2v-8h-2v8z"/>
         </svg>
         의정 지도
+      </button>
+      <button class="tab-btn" id="tab-architecture" role="tab" aria-selected="false">
+        <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 21h18v-2h-1V9.7L12 3 4 9.7V19H3v2zm3-2v-8.36l6-5 6 5V19h-4v-6h-4v6H6z"/>
+        </svg>
+        Study 건축
       </button>
     </div>
 
@@ -164,6 +170,126 @@
         </div>
       </div>
 
+    </main>
+
+    <!-- 메인 뷰 3: 개인 주택 평면 스터디 -->
+    <main id="architecture-view" style="display: none;">
+      <section class="architecture-header">
+        <div>
+          <span class="architecture-kicker">PRIVATE STUDY</span>
+          <h2>내 집 평면 스튜디오</h2>
+          <p>방을 추가하고 도면 위에서 직접 옮기며 실제 치수와 면적을 검토합니다.</p>
+        </div>
+        <label class="plan-title-field">
+          <span>프로젝트명</span>
+          <input type="text" id="plan-title" value="나의 첫 번째 집" maxlength="40">
+        </label>
+      </section>
+
+      <section class="architecture-toolbar" aria-label="평면 편집 도구">
+        <div class="room-add-controls">
+          <div class="room-preset-field">
+            <label for="room-preset">공간</label>
+            <select id="room-preset">
+              <option value="living">거실</option>
+              <option value="bedroom">침실</option>
+              <option value="kitchen">주방</option>
+              <option value="bathroom">욕실</option>
+              <option value="study">서재</option>
+              <option value="utility">다용도실</option>
+            </select>
+          </div>
+          <button type="button" class="architecture-btn primary" id="add-room">+ 공간 추가</button>
+        </div>
+        <div class="history-controls">
+          <button type="button" class="architecture-icon-btn" id="undo-plan" aria-label="실행 취소" title="실행 취소">↶</button>
+          <button type="button" class="architecture-icon-btn" id="redo-plan" aria-label="다시 실행" title="다시 실행">↷</button>
+          <button type="button" class="architecture-btn" id="export-plan">설계 내보내기</button>
+          <button type="button" class="architecture-btn subtle" id="reset-plan">초기안 복원</button>
+        </div>
+      </section>
+
+      <section class="plan-metrics" aria-label="설계 요약">
+        <div><span>계획 면적</span><strong id="plan-area">0 m²</strong></div>
+        <div><span>공간 수</span><strong id="room-count">0개</strong></div>
+        <div><span>배치 상태</span><strong id="overlap-status">정상</strong></div>
+        <div><span>저장</span><strong id="save-status">자동 저장됨</strong></div>
+      </section>
+
+      <section class="architecture-workspace">
+        <div class="plan-stage-wrap">
+          <div class="plan-rulers" aria-hidden="true">
+            <span>0m</span><span id="plan-ruler-mid">7m</span><span id="plan-ruler-end">14m</span>
+          </div>
+          <div class="plan-stage" id="plan-stage" aria-label="주택 평면 편집 영역">
+            <div class="plan-north" aria-hidden="true"><span>북</span>↑</div>
+            <div class="plan-scale" id="plan-scale">한 칸 0.5m</div>
+          </div>
+          <p class="plan-stage-note">공간을 드래그해 이동하고 오른쪽 아래 조절점을 끌어 크기를 바꿀 수 있습니다.</p>
+        </div>
+
+        <aside class="room-inspector" aria-label="선택 공간 속성">
+          <label class="room-list-field" for="room-list">
+            <span>공간 목록</span>
+            <select id="room-list"></select>
+          </label>
+          <div class="inspector-empty" id="inspector-empty">
+            <strong>공간을 선택하세요</strong>
+            <span>이름, 위치와 실제 치수를 조절할 수 있습니다.</span>
+          </div>
+          <div id="inspector-fields" style="display: none;">
+            <div class="inspector-heading">
+              <div>
+                <span>선택 공간</span>
+                <strong id="selected-room-area">0 m²</strong>
+              </div>
+              <button type="button" class="delete-room-btn" id="delete-room">삭제</button>
+            </div>
+
+            <label class="inspector-field full">
+              <span>공간 이름</span>
+              <input type="text" id="room-name" maxlength="20">
+            </label>
+
+            <div class="inspector-grid">
+              <label class="inspector-field">
+                <span>가로 (m)</span>
+                <input type="number" id="room-width" min="1" max="14" step="0.5">
+              </label>
+              <label class="inspector-field">
+                <span>세로 (m)</span>
+                <input type="number" id="room-height" min="1" max="10" step="0.5">
+              </label>
+              <label class="inspector-field">
+                <span>X 위치 (m)</span>
+                <input type="number" id="room-x" min="0" max="14" step="0.5">
+              </label>
+              <label class="inspector-field">
+                <span>Y 위치 (m)</span>
+                <input type="number" id="room-y" min="0" max="10" step="0.5">
+              </label>
+            </div>
+
+            <fieldset class="room-color-field">
+              <legend>공간 색상</legend>
+              <div id="room-color-options" class="room-color-options"></div>
+            </fieldset>
+          </div>
+          <div class="site-size-editor">
+            <span>도면 경계</span>
+            <div class="inspector-grid">
+              <label class="inspector-field">
+                <span>전체 가로 (m)</span>
+                <input type="number" id="plan-width" min="6" max="30" step="0.5">
+              </label>
+              <label class="inspector-field">
+                <span>전체 세로 (m)</span>
+                <input type="number" id="plan-height" min="6" max="24" step="0.5">
+              </label>
+            </div>
+          </div>
+        </aside>
+      </section>
     </main>
 
     <!-- 푸터 -->

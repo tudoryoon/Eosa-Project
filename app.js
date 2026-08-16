@@ -1,11 +1,12 @@
 import members from './data.js';
+import { initArchitecture, refreshArchitecture } from './architecture.js';
 
 // 애플리케이션 상태 관리
 const state = {
   members: members,
   filteredMembers: members,
   selectedMember: null,
-  activeTab: 'list', // 'list' | 'dashboard'
+  activeTab: 'list', // 'list' | 'dashboard' | 'architecture'
   searchQuery: '',
   filters: {
     party: 'all',
@@ -17,8 +18,10 @@ const state = {
 const DOM = {
   tabList: document.getElementById('tab-list'),
   tabDashboard: document.getElementById('tab-dashboard'),
+  tabArchitecture: document.getElementById('tab-architecture'),
   listView: document.getElementById('list-view'),
   dashboardView: document.getElementById('dashboard-view'),
+  architectureView: document.getElementById('architecture-view'),
   searchInput: document.getElementById('ai-search-input'),
   filterParty: document.getElementById('filter-party'),
   filterRegion: document.getElementById('filter-region'),
@@ -33,6 +36,7 @@ const DOM = {
 function init() {
   setupEventListeners();
   populateFilterOptions();
+  initArchitecture();
   render();
 }
 
@@ -62,6 +66,7 @@ function setupEventListeners() {
   // 탭 전환
   DOM.tabList.addEventListener('click', () => switchTab('list'));
   DOM.tabDashboard.addEventListener('click', () => switchTab('dashboard'));
+  DOM.tabArchitecture.addEventListener('click', () => switchTab('architecture'));
 
   // 검색 입력
   DOM.searchInput.addEventListener('input', (e) => {
@@ -107,17 +112,23 @@ function setupEventListeners() {
 // 탭 전환
 function switchTab(tab) {
   state.activeTab = tab;
-  if (tab === 'list') {
-    DOM.tabList.classList.add('active');
-    DOM.tabDashboard.classList.remove('active');
-    DOM.listView.style.display = 'block';
-    DOM.dashboardView.style.display = 'none';
-  } else {
-    DOM.tabList.classList.remove('active');
-    DOM.tabDashboard.classList.add('active');
-    DOM.listView.style.display = 'none';
-    DOM.dashboardView.style.display = 'block';
+  const tabMap = {
+    list: [DOM.tabList, DOM.listView],
+    dashboard: [DOM.tabDashboard, DOM.dashboardView],
+    architecture: [DOM.tabArchitecture, DOM.architectureView]
+  };
+
+  Object.entries(tabMap).forEach(([name, [button, view]]) => {
+    const isActive = name === tab;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-selected', String(isActive));
+    view.style.display = isActive ? 'block' : 'none';
+  });
+
+  if (tab === 'dashboard') {
     renderDashboard();
+  } else if (tab === 'architecture') {
+    refreshArchitecture();
   }
 }
 
